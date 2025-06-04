@@ -100,3 +100,19 @@ numprocs=1
 redirect_stderr=true
 stdout_logfile=/var/log/laravel-worker.log
 ```
+
+
+## Install NodeJS v22
+
+```
+cd ~
+curl -sL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+```
+
+```
+sudo bash nodesource_setup.sh
+```
+
+```
+sudo apt install nodejs
+```
