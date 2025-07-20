@@ -117,6 +117,16 @@ redirect_stderr=true
 stdout_logfile=/var/log/laravel-worker.log
 ```
 
+## Nginx with Let's Encrypt
+
+```
+sudo apt install certbot python3-certbot-nginx
+```
+
+```
+sudo certbot --nginx -d example.com -d www.example.com
+```
+
 
 ## Install NodeJS v22
 
