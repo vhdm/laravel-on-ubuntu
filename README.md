@@ -91,7 +91,7 @@ server {
         fastcgi_hide_header X-Powered-By;
     }
 
-    location ~ ^/phpmyadmin/(doc|sql|setup|test|config|examples|libraries) {
+    location ~ ^/xvpma/(doc|sql|setup|test|config|examples|libraries) {
         deny all;
     }
 
