@@ -27,22 +27,13 @@ vi /etc/nginx/nginx.conf
 
 `http`
 ```
-
 server_tokens off;
-
 limit_req_zone  $binary_remote_addr  zone=req_limit:10m  rate=10r/s;
 limit_conn_zone $binary_remote_addr  zone=conn_limit:10m;
-
-gzip on;
-gzip_comp_level 5;
-gzip_proxied any;
-gzip_types text/plain text/css application/json application/javascript application/xml text/javascript image/svg+xml;
-
 map $sent_http_content_type $static_cache_control {
     default                                 "public, max-age=0";
     "~*text|javascript|json|xml|font|image" "public, max-age=31536000, immutable";
 }
-
 proxy_intercept_errors on;
 
 ```
