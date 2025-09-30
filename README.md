@@ -73,6 +73,28 @@ server {
         try_files $uri $uri/ /index.php?$query_string;
     }
 
+
+
+
+    location ~ ^/xvpma/(.+\.php)$ {
+        root /var/www/example.com/public;
+
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+
+        fastcgi_read_timeout 60s;
+        fastcgi_send_timeout 60s;
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+
+        fastcgi_hide_header X-Powered-By;
+    }
+
+    location ~ ^/phpmyadmin/(doc|sql|setup|test|config|examples|libraries) {
+        deny all;
+    }
+
     location ~* \.(?:css|js|mjs|json|map|jpg|jpeg|png|gif|svg|webp|ico|woff2?|ttf|eot)$ {
         access_log off;
         expires max;
