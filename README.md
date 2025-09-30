@@ -47,6 +47,10 @@ proxy_intercept_errors on;
 ```
 
 ```
+vi /etc/nginx/sites-available/laravel.conf
+```
+
+```
 server {
     listen 80;
     listen [::]:80;
@@ -119,6 +123,10 @@ server {
     location ~* /(composer\.(json|lock)|package(-lock)?\.json|yarn\.lock|artisan|README|LICENSE|Makefile)$ { deny all; }
     location ~ /\.(?!well-known).* { deny all; }  
 }
+```
+
+```
+ln -s /etc/nginx/sites-available/laravel.conf /etc/nginx/sites-enabled/laravel.conf
 ```
 
 ## Install PHP8.3
