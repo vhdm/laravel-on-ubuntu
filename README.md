@@ -30,10 +30,6 @@ vi /etc/nginx/nginx.conf
 server_tokens off;
 limit_req_zone  $binary_remote_addr  zone=req_limit:10m  rate=10r/s;
 limit_conn_zone $binary_remote_addr  zone=conn_limit:10m;
-map $sent_http_content_type $static_cache_control {
-    default                                 "public, max-age=0";
-    "~*text|javascript|json|xml|font|image" "public, max-age=31536000, immutable";
-}
 proxy_intercept_errors on;
 
 ```
@@ -93,13 +89,6 @@ server {
 
     location ~ ^/xvpma/(doc|sql|setup|test|config|examples|libraries) {
         deny all;
-    }
-
-    location ~* \.(?:css|js|mjs|json|map|jpg|jpeg|png|gif|svg|webp|ico|woff2?|ttf|eot)$ {
-        access_log off;
-        expires max;
-        add_header Cache-Control $static_cache_control always;
-        try_files $uri =404;
     }
 
     location / {
