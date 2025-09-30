@@ -22,18 +22,67 @@ curl -4 icanhazip.com
 ```
 
 ```
+vi /etc/nginx/nginx.conf
+```
+
+```
+
+server_tokens off;
+
+limit_req_zone  $binary_remote_addr  zone=req_limit:10m  rate=10r/s;
+limit_conn_zone $binary_remote_addr  zone=conn_limit:10m;
+
+gzip on;
+gzip_comp_level 5;
+gzip_proxied any;
+gzip_types text/plain text/css application/json application/javascript application/xml text/javascript image/svg+xml;
+
+map $sent_http_content_type $static_cache_control {
+    default                                 "public, max-age=0";
+    "~*text|javascript|json|xml|font|image" "public, max-age=31536000, immutable";
+}
+
+proxy_intercept_errors on;
+
+```
+
+```
 server {
     listen 80;
     listen [::]:80;
-    server_name example.com;
-    root /var/www/example.com/public;
+    server_name example.com www.example.com;
 
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-
-    index index.php;
-
+    root   /var/www/example.com/public;
+    index  index.php;
     charset utf-8;
+
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+    client_max_body_size 20m;    
+    client_body_timeout 30s;
+    client_header_timeout 15s;
+    keepalive_timeout 65s;
+
+    limit_req  zone=req_limit  burst=20  nodelay;
+    limit_conn conn_limit 200;
+
+    access_log /var/log/nginx/example.access.log;
+    error_log  /var/log/nginx/example.error.log warn;
+
+    location ~ ^/flux/flux(\.min)?\.(js|css)$ {
+        expires off;
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~* \.(?:css|js|mjs|json|map|jpg|jpeg|png|gif|svg|webp|ico|woff2?|ttf|eot)$ {
+        access_log off;
+        expires max;
+        add_header Cache-Control $static_cache_control always;
+        try_files $uri =404;
+    }
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
@@ -45,15 +94,30 @@ server {
     error_page 404 /index.php;
 
     location ~ ^/index\.php(/|$) {
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        include fastcgi.conf; 
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
+
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+
+        fastcgi_read_timeout 60s;
+        fastcgi_send_timeout 60s;
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+        fastcgi_busy_buffers_size 64k;
+
         fastcgi_hide_header X-Powered-By;
+
+        try_files $fastcgi_script_name =404;
     }
 
-    location ~ /\.(?!well-known).* {
-        deny all;
+    location ~ \.php$ {
+        return 403;
     }
+
+    location ~* ^/(?:\.env|\.git|\.hg|\.svn|\.DS_Store) { deny all; }
+    location ~* ^/(?:storage|vendor|node_modules|routes|database|resources|tests|config)/ { deny all; }
+    location ~* /(composer\.(json|lock)|package(-lock)?\.json|yarn\.lock|artisan|README|LICENSE|Makefile)$ { deny all; }
+    location ~ /\.(?!well-known).* { deny all; }  
 }
 ```
 
