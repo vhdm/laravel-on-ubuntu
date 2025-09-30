@@ -129,6 +129,10 @@ server {
 ```
 
 ```
+service nginx restart
+```
+
+```
 ln -s /etc/nginx/sites-available/laravel.conf /etc/nginx/sites-enabled/laravel.conf
 ```
 
