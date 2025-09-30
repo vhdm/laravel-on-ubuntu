@@ -185,15 +185,18 @@ sudo apt install supervisor
 ```
 
 ```
-[program:laravel-worker]
-process_name=%(program_name)s_%(process_num)02d
+vi /etc/supervisor/conf.d/queue.conf
+```
+
+```
+[program:queue]
 command=php /path-to-your-laravel-app/artisan queue:work
 autostart=true
 autorestart=true
-user=your-user
+user=root
 numprocs=1
 redirect_stderr=true
-stdout_logfile=/var/log/laravel-worker.log
+stdout_logfile=/var/log/queue.log
 ```
 
 ## Nginx with Let's Encrypt
