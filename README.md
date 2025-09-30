@@ -25,6 +25,7 @@ curl -4 icanhazip.com
 vi /etc/nginx/nginx.conf
 ```
 
+`http`
 ```
 
 server_tokens off;
